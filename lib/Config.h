@@ -8,7 +8,7 @@
 
 namespace trspv {
 
-    /// Kernel (¦Ó, ¦Ã) ²ÎÊıÅäÖÃ
+    /// Kernel (Ï„, Î³) å‚æ•°é…ç½®
     struct KernelConfig {
         double tau_min = 1e-4;
         double tau_max = 1.0;
@@ -19,54 +19,54 @@ namespace trspv {
         std::string gamma_scale = "linear";
     };
 
-    /// ADMM ÓÅ»¯²ÎÊıÅäÖÃ
+    /// ADMM ä¼˜åŒ–å‚æ•°é…ç½®
     struct ADMMConfig {
-        double lambda1 = 1e-3;  // L1 Ï¡Êè
-        double lambda_tv_tau = 1e-3;  // TV ÔÚ ¦Ó ·½ÏòÆ½»¬
-        double lambda_tv_beta = 1e-3;  // TV ÔÚ ¦Â ·½ÏòÆ½»¬
-        double rho = 1.0;   // Ôö¹ã²ÎÊı
+        double lambda1 = 1e-3;  // L1 ç¨€ç–
+        double lambda_tv_tau = 1e-3;  // TV åœ¨ Ï„ æ–¹å‘å¹³æ»‘
+        double lambda_tv_beta = 1e-3;  // TV åœ¨ Î² æ–¹å‘å¹³æ»‘
+        double rho = 1.0;   // å¢å¹¿å‚æ•°
         int    max_iters = 500;
         double tol_primal = 1e-6;
         double tol_dual = 1e-6;
 
         std::vector<double> l1_weights;
-        int group_size_tau = 5;    // ÏàÁÚ ¦Ó  µãÊı
-        int group_size_beta = 3;    // ÏàÁÚ ¦Â  µãÊı
-        int gamma_stride = 0;    // = ¦Ó_list.size()£¬ÓÉ×Öµä»ØÌî
+        int group_size_tau = 5;    // ç›¸é‚» Ï„  ç‚¹æ•°
+        int group_size_beta = 3;    // ç›¸é‚» Î²  ç‚¹æ•°
+        int gamma_stride = 0;    // = Ï„_list.size()ï¼Œç”±å­—å…¸å›å¡«
 
-        int Nt = 0;  // ¦Ó µãÊı
-        int Nb = 0;  // ¦Â µãÊı
+        int Nt = 0;  // Ï„ ç‚¹æ•°
+        int Nb = 0;  // Î² ç‚¹æ•°
 
     };
 
-    /// ¹éÒ»»¯ÉèÖÃ
+    /// å½’ä¸€åŒ–è®¾ç½®
     struct NormalizationConfig {
         bool enabled = true;
     };
 
-    /// ²åÖµ/²¹µã·½·¨Ã¶¾Ù
+    /// æ’å€¼/è¡¥ç‚¹æ–¹æ³•æšä¸¾
     enum class CompletionMethod {
         None,
         PCHIP,
         Akima
     };
 
-    /// ÆµÆ×²åÖµ/²¹µãÅäÖÃ
+    /// é¢‘è°±æ’å€¼/è¡¥ç‚¹é…ç½®
     struct SpectrumCompletionConfig {
-        CompletionMethod method = CompletionMethod::None;  // ²åÖµ·½·¨
-        bool             interpolate = false;                   // ÊÇ·ñÆôÓÃ²åÖµ
-        int              num_points = 100;                     // ²åÖµºó²ÉÑùµãÊı
-        bool             log_space = true;                    // ¶ÔÊı¿Õ¼ä²ÉÑù
-        double           weight = 0.2;                     // ²åÖµµãÈ¨ÖØ
+        CompletionMethod method = CompletionMethod::None;  // æ’å€¼æ–¹æ³•
+        bool             interpolate = false;                   // æ˜¯å¦å¯ç”¨æ’å€¼
+        int              num_points = 100;                     // æ’å€¼åé‡‡æ ·ç‚¹æ•°
+        bool             log_space = true;                    // å¯¹æ•°ç©ºé—´é‡‡æ ·
+        double           weight = 0.2;                     // æ’å€¼ç‚¹æƒé‡
     };
 
     struct FindPeaksConfig {
         bool   enable = true;
         std::string interp_type = "akima"; // "akima" | "pchip"
-        int    smooth_window = 5;       // odd ¡İ3; 0 = off
+        int    smooth_window = 5;       // odd â‰¥3; 0 = off
         double peak_prominence = 0.02;    // relative (0-1)
         double peak_dist_dec = 0.15;    // decades
-        int    interp_factor = 4;       // up-sampling ¡Áfactor
+        int    interp_factor = 4;       // up-sampling Ã—factor
         double      weight_factor = 0.5;
     };
 
@@ -74,36 +74,36 @@ namespace trspv {
         FindPeaksConfig find_peaks;
     };
 
-    /// Beta£¨À­ÉìÖ¸Êı£©ÓÅ»¯·½·¨
+    /// Betaï¼ˆæ‹‰ä¼¸æŒ‡æ•°ï¼‰ä¼˜åŒ–æ–¹æ³•
     enum class BetaMethod { Newton, GridSearch };
 
     struct PriorsConfig {
-        double beta_center = 1.0;   // ÏÈÑéÖĞĞÄ
-        double beta_sigma = 0.25;  // Àë 1 ³¬¹ı ~0.25 ¾ÍÃ÷ÏÔ¼Ó·£
-        double beta_strength = 2;   // 0 ¹Ø±Õ£»1~2 ³£ÓÃ
+        double beta_center = 1.0;   // å…ˆéªŒä¸­å¿ƒ
+        double beta_sigma = 0.25;  // ç¦» 1 è¶…è¿‡ ~0.25 å°±æ˜æ˜¾åŠ ç½š
+        double beta_strength = 2;   // 0 å…³é—­ï¼›1~2 å¸¸ç”¨
     };
 
 
     struct ParamSelectionConfig {
-        bool    enable = false;    ///< ÊÇ·ñÆôÓÃ×Ô¶¯µ÷²Î
-        int     num_lambda1 = 20;       ///< ¦Ë1 Íø¸ñµãÊı
+        bool    enable = false;    ///< æ˜¯å¦å¯ç”¨è‡ªåŠ¨è°ƒå‚
+        int     num_lambda1 = 20;       ///< Î»1 ç½‘æ ¼ç‚¹æ•°
         double  lambda1_min = 1e-4;
         double  lambda1_max = 1e-1;
-        int     num_lambdat = 20;       ///< ¦Ë¦Ó TV Íø¸ñµãÊı
+        int     num_lambdat = 20;       ///< Î»Ï„ TV ç½‘æ ¼ç‚¹æ•°
         double  lambdat_min = 1e-4;
         double  lambdat_max = 1e-1;
-        int     num_lambdab = 20;       ///< ¦Ë¦Â TV Íø¸ñµãÊı
+        int     num_lambdab = 20;       ///< Î»Î² TV ç½‘æ ¼ç‚¹æ•°
         double  lambdab_min = 1e-4;
         double  lambdab_max = 1e-1;
         std::string outputDir = "";
-        // ¡ª¡ª¡ª É¨Ãè½×¶Î ADMM ²ÎÊı ¡ª¡ª¡ª
-        int     scan_max_iters = 50;   ///< É¨ÃèÊ±×î´óµü´úÊı
-        double  scan_tol = 1e-3; ///< É¨ÃèÊ±Ô­Ê¼/¶ÔÅ¼ÈİÈÌ¶È
-        bool    refine_after = true; ///< É¨ÃèºóÊÇ·ñÓÃÑÏ¸ñ ADMM ÔÙÅÜÒ»´Î
+        // â€”â€”â€” æ‰«æé˜¶æ®µ ADMM å‚æ•° â€”â€”â€”
+        int     scan_max_iters = 50;   ///< æ‰«ææ—¶æœ€å¤§è¿­ä»£æ•°
+        double  scan_tol = 1e-3; ///< æ‰«ææ—¶åŸå§‹/å¯¹å¶å®¹å¿åº¦
+        bool    refine_after = true; ///< æ‰«æåæ˜¯å¦ç”¨ä¸¥æ ¼ ADMM å†è·‘ä¸€æ¬¡
     };
 
     struct JointConfig {
-        // ADMM Ïà¹Ø
+        // ADMM ç›¸å…³
         double lambda1 = 1e-3;
         double lambda_tv = 1e-3;
         double rho = 1.0;
@@ -111,39 +111,39 @@ namespace trspv {
         double tol_admm_primal = 1e-6;
         double tol_admm_dual = 1e-6;
 
-        // À­ÉìÖ¸ÊıÓÅ»¯Ïà¹Ø
+        // æ‹‰ä¼¸æŒ‡æ•°ä¼˜åŒ–ç›¸å…³
         double beta_init = 1.0;
         double beta_min = 0.1;
         double beta_max = 2.0;
         int    max_iter_beta = 50;
         double tol_beta = 1e-4;
-        // µ÷ÓÃÍâ²¿ÓÅ»¯¿â»ò×ÔĞ´Ò»Î¬Å£¶Ù/Íø¸ñ
+        // è°ƒç”¨å¤–éƒ¨ä¼˜åŒ–åº“æˆ–è‡ªå†™ä¸€ç»´ç‰›é¡¿/ç½‘æ ¼
         enum class BetaMethod { Newton, GridSearch } beta_method = BetaMethod::GridSearch;
-        int    beta_grid_points = 20; // Èç¹ûÓÃÍø¸ñËÑË÷
+        int    beta_grid_points = 20; // å¦‚æœç”¨ç½‘æ ¼æœç´¢
     };
 
-    /// ÈÕÖ¾Ä£¿éÅäÖÃ
+    /// æ—¥å¿—æ¨¡å—é…ç½®
     struct LoggingConfig {
         std::string file = "logs/run.log";
         std::string level = "INFO";
         int snapshotInterval = 100;
     };
 
-    /// ¿ÉÊÓ»¯Ïà¹ØÅäÖÃ
+    /// å¯è§†åŒ–ç›¸å…³é…ç½®
     struct VisualizationConfig {
         bool enabled = false;
         std::string outputDir = "results/";
     };
 
-    /// ÍêÕûÅäÖÃ½á¹¹
+    /// å®Œæ•´é…ç½®ç»“æ„
     struct Config {
-        // Êı¾İÊäÈë
+        // æ•°æ®è¾“å…¥
         std::string inputFile = "examples/sample_spectrum.csv";
         bool noiseWeighted = true;
 
         std::string spectrum_input_type = "freq";
 
-        // ¸÷×ÓÄ£¿éÅäÖÃ
+        // å„å­æ¨¡å—é…ç½®
         KernelConfig kernel;
         ADMMConfig admm;
         NormalizationConfig normalization;
@@ -156,14 +156,14 @@ namespace trspv {
 
     };
 
-    /// ÅäÖÃ¼ÓÔØÆ÷
+    /// é…ç½®åŠ è½½å™¨
     class ConfigLoader {
     public:
         /**
-         * ´Ó JSON ÎÄ¼ş¼ÓÔØ Config¡£
-         * @param path ÅäÖÃÎÄ¼şÂ·¾¶
-         * @return ÅäÖÃ¶ÔÏó
-         * @throws std::runtime_error Èç¹ûÎÄ¼ş´ò²»¿ª»ò¸ñÊ½²»¶Ô
+         * ä» JSON æ–‡ä»¶åŠ è½½ Configã€‚
+         * @param path é…ç½®æ–‡ä»¶è·¯å¾„
+         * @return é…ç½®å¯¹è±¡
+         * @throws std::runtime_error å¦‚æœæ–‡ä»¶æ‰“ä¸å¼€æˆ–æ ¼å¼ä¸å¯¹
          */
         static Config from_file(const std::string& path);
     };
