@@ -1,0 +1,67 @@
+{
+  "data": {
+    "input_file": "examples/trspv_single_exp_tau_1e-01s.csv",
+    "noise_weighted": false,
+    "input_type": "period"
+  },
+
+  "kernel": {
+    "tau_min": 1e-5,
+    "tau_max": 1.0,
+    "num_tau": 70,
+    "gamma_min":   0.2,
+    "gamma_max":   2.0,
+    "num_gamma":   25,
+    "gamma_scale": "linear"
+  },
+
+  "admm": {
+    "lambda1": 1e-3,                            
+    "lambda_tv_tau": 1e-3,                       
+    "lambda_tv_beta": 1e-3,                      
+    "rho": 1.0,                                  
+    "max_iters": 500,                            
+    "tol_primal": 1e-6,                          
+    "tol_dual": 1e-6
+  },
+
+  "normalization": {
+    "enabled": false
+  },
+
+  "spectrum_completion": {
+    "method": "PCHIP",
+    "interpolate": true,
+    "log_space": true,
+    "weight": 0.3,
+    "num_points": 100
+  },
+
+  "logging": {
+    "file": "logs/test_config.log",
+    "level": "DEBUG",
+    "snapshotInterval": 50
+  },
+
+  "visualization": {
+    "enabled": true,
+    "outputDir": "results/"
+  },
+
+  "param_selection": {
+    "enable": true,
+    "num_lambda1": 10,
+    "lambda1_min": 1e-5,
+    "lambda1_max": 1,
+    "num_lambdat": 10,
+    "lambdat_min": 1e-5,
+    "lambdat_max": 1,
+    "num_lambdab": 10,
+    "lambdab_min": 1e-5,
+    "lambdab_max": 1,
+    "outputDir": "reports",
+   "scan_max_iters": 500,
+   "scan_tol": 1e-3,
+   "refine_after": true 
+  }
+}

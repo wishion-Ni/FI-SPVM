@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "eigen3",
+    "fftw3",
+    "gtest",
+    "matplotlib-cpp",
+    "spdlog",
+    "nlohmann-json"
+  ]
+}
