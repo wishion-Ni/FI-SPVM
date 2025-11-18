@@ -36,26 +36,26 @@ namespace trspv {
     Config ConfigLoader::from_file(const std::string& path) {
         std::ifstream ifs(path);
         if (!ifs.is_open()) {
-            throw std::runtime_error("�޷��������ļ�: " + path);
+            throw std::runtime_error("无法打开配置文件: " + path);
         }
         json j;
         try {
             ifs >> j;
         }
         catch (const json::parse_error& e) {
-            throw std::runtime_error(std::string("JSON ��������: ") + e.what());
+            throw std::runtime_error(std::string("JSON 解析错误: ") + e.what());
         }
 
-        Config cfg; // Ĭ��ֵ���ڽṹ���г�ʼ��
+        Config cfg; // 默认值已在结构体中初始化
 
-        // �������
+        // 顶层兼容
         if (j.contains("inputFile"))       cfg.inputFile = j["inputFile"].get<std::string>();
         if (j.contains("noiseWeighted"))   cfg.noiseWeighted = j["noiseWeighted"].get<bool>();
         if (j.contains("spectrum_input_type"))
             cfg.spectrum_input_type = j["spectrum_input_type"].get<std::string>();
 
 
-        // data ��
+        // data 段
         if (j.contains("data")) {
             auto& jd = j["data"];
             if (jd.contains("input_file")) cfg.inputFile = jd["input_file"].get<std::string>();
@@ -63,7 +63,7 @@ namespace trspv {
             if (jd.contains("input_type")) cfg.spectrum_input_type = jd["input_type"].get<std::string>();
         }
 
-        // kernel ��
+        // kernel 段
         if (j.contains("kernel")) {
             auto& jk = j["kernel"];
             if (jk.contains("tau_min"))    cfg.kernel.tau_min = jk["tau_min"].get<double>();
@@ -75,7 +75,7 @@ namespace trspv {
             if (jk.contains("gamma_scale")) cfg.kernel.gamma_scale = jk["gamma_scale"].get<std::string>();
         }
 
-        // admm ��
+        // admm 段
         if (j.contains("admm")) {
             auto & ja = j["admm"];
             if (ja.contains("lambda1"))         cfg.admm.lambda1 = ja["lambda1"].get<double>();
@@ -91,7 +91,7 @@ namespace trspv {
 
         }
 
-        // priors ��
+        // priors 段
         if (j.contains("priors")) {
             auto& jp = j["priors"];
             if (jp.contains("beta_center"))   cfg.priors.beta_center = jp["beta_center"].get<double>();
@@ -100,13 +100,13 @@ namespace trspv {
         }
 
 
-        // normalization ��
+        // normalization 段
         if (j.contains("normalization")) {
             auto& jn = j["normalization"];
             if (jn.contains("enabled")) cfg.normalization.enabled = jn["enabled"].get<bool>();
         }
 
-        // spectrum_completion ��
+        // spectrum_completion 段
         if (j.contains("spectrum_completion")) {
             auto& jc = j["spectrum_completion"];
             if (jc.contains("method")) {
@@ -123,7 +123,7 @@ namespace trspv {
                 cfg.completion.num_points = jc["num_points"].get<int>();
         }
 
-        // logging ��
+        // logging 段
         if (j.contains("logging")) {
             auto& jl = j["logging"];
             if (jl.contains("file"))             cfg.logging.file = jl["file"].get<std::string>();
@@ -131,16 +131,14 @@ namespace trspv {
             if (jl.contains("snapshotInterval")) cfg.logging.snapshotInterval = jl["snapshotInterval"].get<int>();
         }
 
-        // visualization ��
+        // visualization 段
         if (j.contains("visualization")) {
             auto& jv = j["visualization"];
             if (jv.contains("enabled")) cfg.visualization.enabled = jv["enabled"].get<bool>();
             if (jv.contains("outputDir")) cfg.visualization.outputDir = jv["outputDir"].get<std::string>();
-            if (jv.contains("transient_tmax")) cfg.visualization.transient_tmax = jv["transient_tmax"].get<double>();
-            if (jv.contains("transient_samples")) cfg.visualization.transient_samples = jv["transient_samples"].get<int>();
         }
 
-        // param_selection ��
+        // param_selection 段
         if (j.contains("param_selection")) {
             auto & jp = j["param_selection"];
             auto & psc = cfg.param_selection;
@@ -154,7 +152,7 @@ namespace trspv {
             if (jp.contains("num_lambdab"))  psc.num_lambdab = jp["num_lambdab"].get<int>();
             if (jp.contains("lambdab_min"))  psc.lambdab_min = jp["lambdab_min"].get<double>();
             if (jp.contains("lambdab_max"))  psc.lambdab_max = jp["lambdab_max"].get<double>();
-                    // Ĭ��д�� visualization.outputDir��JSON �ɸ���
+                    // 默认写到 visualization.outputDir，JSON 可覆盖
                 psc.outputDir = cfg.visualization.outputDir;
             if (jp.contains("outputDir"))    psc.outputDir = jp["outputDir"].get<std::string>();
             if (jp.contains("scan_max_iters")) psc.scan_max_iters = jp["scan_max_iters"].get<int>();
