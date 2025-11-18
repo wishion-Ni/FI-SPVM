@@ -14,14 +14,14 @@
 #include <deque>
 
 
-#include "Config.h"
-#include "SpectrumData.h"
-#include "SpectrumCompletion.h"
-#include "DictionaryGenerator.h"
-#include "Utils.h"
-#include "Solver2D.h"
-#include "ParamSelector.h"
-#include "PeakSeedDetector.h"
+#include "../lib/Config.h"
+#include "../lib/SpectrumData.h"
+#include "../lib/SpectrumCompletion.h"
+#include "../lib/DictionaryGenerator.h"
+#include "../lib/Utils.h"
+#include "../lib/Solver2D.h"
+#include "../lib/ParamSelector.h"
+#include "../lib/PeakSeedDetector.h"
 #include <Eigen/Dense>
 
 
