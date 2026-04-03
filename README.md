@@ -1,27 +1,62 @@
 # FI-SPVM
 
-This repository is organized into two directories:
+The repository is organized into:
 
-- `lib/`: Core library headers and implementations for the spectral variational model.
-- `src/`: Application orchestration code, including `SolverApp`.
-- `apps/`: Thin executable entry points such as `apps/trspv_cli/main.cpp`.
+- `lib/`: core algorithms, config, optimization, and output writers.
+- `src/`: application orchestration (`SolverApp`).
+- `apps/`: thin executable entry points (`apps/trspv_cli/main.cpp`).
+- `tests/`: unit and smoke tests.
 
-Configuration samples (`config.json`) remain at the repository root.
+## Build and test from scratch
 
-## Unified entry
+This project uses `CMake + CMakePresets + vcpkg manifest`.
 
-The CLI entry has been converged to a thin `main` in `apps/trspv_cli/main.cpp`.
-Argument parsing, config loading, solver orchestration, and output generation now
-flow through `SolverApp::run(argc, argv)` only.
+Prerequisites:
 
-`src/trSPVSolver.cpp` is kept as a temporary compatibility placeholder so older
-build references do not immediately break, but it no longer owns solver logic.
+- C++17 compiler toolchain
+- CMake 3.24+
+- `vcpkg` checkout with `VCPKG_ROOT` set
+- On Windows: Visual Studio 2022 (or Build Tools 2022 with MSVC)
+
+Windows (PowerShell):
+
+```powershell
+# run inside "Developer PowerShell for VS 2022"
+$env:VCPKG_ROOT="C:\\path\\to\\vcpkg"
+cmake --preset dev-windows
+cmake --build --preset build-dev-windows --config Release
+ctest --preset test-dev-windows --output-on-failure
+```
+
+Linux (bash):
+
+```bash
+export VCPKG_ROOT=/path/to/vcpkg
+cmake --preset dev-linux
+cmake --build --preset build-dev-linux
+ctest --preset test-dev-linux --output-on-failure
+```
+
+## Run CLI
+
+```bash
+trspv_cli --conf config.json
+```
+
+Compatible legacy form:
+
+```bash
+trspv_cli config.json
+```
+
+## Notes
+
+- The solver pipeline is unified through `SolverApp::run(argc, argv)`.
+- `src/trSPVSolver.cpp` is a compatibility placeholder and is not part of build targets.
 
 ## Refactor task hub
 
-To make the refactor roadmap directly discoverable in this code repository, task checklists and log templates are tracked under:
+Task checklists and log templates are tracked under:
 
 - `task-hub/README.md`
 - `task-hub/2026-04-02_v1.0/`
-
-Start from `task-hub/2026-04-02_v1.0/00_INDEX_2026-04-02_v1.0.md` and create execution logs using `LOG_TEMPLATE_2026-04-02_v1.0.md` in the same batch folder.

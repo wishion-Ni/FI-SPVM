@@ -2,28 +2,44 @@
 
 ## Prerequisites
 
-- A C++ toolchain with C++17 support.
-- Dependencies from `vcpkg.json`, including `eigen3`, `nlohmann-json`, `fftw3`, `spdlog`, and `gtest`.
-- A local build system or IDE project configured to compile the sources in this repository.
+- C++17 compiler toolchain.
+- CMake 3.24 or newer.
+- `vcpkg` checkout with `VCPKG_ROOT` set in the environment.
+- On Windows: Visual Studio 2022 or Build Tools 2022 with MSVC.
+
+## Configure and Build
+
+Windows:
+
+```powershell
+# run inside "Developer PowerShell for VS 2022"
+$env:VCPKG_ROOT="C:\\path\\to\\vcpkg"
+cmake --preset dev-windows
+cmake --build --preset build-dev-windows --config Release
+ctest --preset test-dev-windows --output-on-failure
+```
+
+Linux:
+
+```bash
+export VCPKG_ROOT=/path/to/vcpkg
+cmake --preset dev-linux
+cmake --build --preset build-dev-linux
+ctest --preset test-dev-linux --output-on-failure
+```
 
 ## Basic Run
 
-The unified CLI entry is `apps/trspv_cli/main.cpp`. The expected invocation pattern is:
+Windows:
 
-```bash
-trspv --conf config.json
+```powershell
+out/build/dev-windows/Release/trspv_cli.exe --conf config.json
 ```
 
-Compatible legacy form:
+Linux:
 
 ```bash
-trspv config.json
-```
-
-Optional overrides:
-
-```bash
-trspv --conf config.json --input path/to/data.csv --out results/run1
+out/build/dev-linux/trspv_cli --conf config.json
 ```
 
 ## Expected Outputs
@@ -41,11 +57,7 @@ If interpolation is enabled, additional interpolation comparison files are gener
 
 ## Development Notes
 
-- The CLI entry should remain thin; workflow logic belongs in `SolverApp`.
-- Output file generation should remain in `ResultWriter`.
-- Config compatibility and validation should remain centralized in `ConfigLoader` and `validate_config`.
-
-## Tests
-
-The repository now contains `tests/config_tests.cpp` for config parsing and validation coverage.
-Hook it into your local build once the project build files are available in version control.
+- Keep CLI entry thin (`apps/trspv_cli/main.cpp`).
+- Keep orchestration in `SolverApp`.
+- Keep file output logic in `ResultWriter`.
+- Keep config parsing and validation centralized in `ConfigLoader` / `validate_config`.

@@ -8,6 +8,17 @@ and reusable library modules:
 - `apps/trspv_cli/main.cpp`: top-level executable entry.
 - `src/SolverApp.*`: argument handling, config loading, solver orchestration.
 - `lib/`: domain logic, optimization, config parsing, IO writers, and utilities.
+- `tests/`: unit tests and runtime smoke tests.
+
+## Build Targets
+
+The CMake build is split into three main targets:
+
+- `fi_spvm_core`: all reusable library implementations from `lib/`.
+- `fi_spvm_app`: orchestration layer (`src/SolverApp.cpp`) linked to `fi_spvm_core`.
+- `trspv_cli`: executable entry (`apps/trspv_cli/main.cpp`) linked to `fi_spvm_app`.
+
+Compatibility file `src/trSPVSolver.cpp` is intentionally not part of build targets.
 
 ## Runtime Flow
 
@@ -50,8 +61,12 @@ and reusable library modules:
 - `lib/ResultWriter.*`: file output generation.
 - `lib/Logger.*`: runtime logging utilities.
 
-## Current Gaps
+## Test Layering
 
-- The repository does not yet include a version-controlled build script.
+- `config_tests`: verifies config parsing compatibility and validation behavior.
+- `cli_smoke_test`: executes the solver path with fixture input and checks key output files.
+
+## Notes
+
+- OpenMP is an optional acceleration path. When unavailable, build falls back to serial scans.
 - `ParamSelector` currently returns only the best parameter set; structured scan exports are not implemented yet.
-- Tests are present as source files, but build integration still needs to be added when the build system is checked in.

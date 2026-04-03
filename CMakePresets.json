@@ -1,0 +1,71 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "dev-windows",
+      "displayName": "Dev Windows",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/out/build/dev-windows",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "FI_SPVM_ENABLE_OPENMP": "ON",
+        "FI_SPVM_BUILD_TESTS": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "dev-linux",
+      "displayName": "Dev Linux",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/dev-linux",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "FI_SPVM_ENABLE_OPENMP": "ON",
+        "FI_SPVM_BUILD_TESTS": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build-dev-windows",
+      "configurePreset": "dev-windows",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-dev-linux",
+      "configurePreset": "dev-linux"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "test-dev-windows",
+      "configurePreset": "dev-windows",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "test-dev-linux",
+      "configurePreset": "dev-linux",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

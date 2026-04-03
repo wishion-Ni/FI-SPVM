@@ -1,0 +1,53 @@
+{
+  "data": {
+    "input_file": "tests/fixtures/smoke_input.csv",
+    "noise_weighted": false,
+    "input_type": "freq"
+  },
+  "kernel": {
+    "tau_min": 1e-4,
+    "tau_max": 1e-1,
+    "num_tau": 6,
+    "gamma_min": 0.5,
+    "gamma_max": 1.5,
+    "num_gamma": 4,
+    "gamma_scale": "linear"
+  },
+  "admm": {
+    "lambda1": 1e-4,
+    "lambda_tv_tau": 1e-5,
+    "lambda_tv_beta": 1e-5,
+    "rho": 1.0,
+    "max_iters": 20,
+    "tol_primal": 1e-4,
+    "tol_dual": 1e-4,
+    "group_size_tau": 1,
+    "group_size_beta": 1
+  },
+  "spectrum_completion": {
+    "method": "none",
+    "interpolate": false,
+    "num_points": 20,
+    "log_space": false,
+    "weight": 0.0
+  },
+  "visualization": {
+    "enabled": true,
+    "outputDir": "results/smoke",
+    "transient_tmax": 0.1,
+    "transient_samples": 16
+  },
+  "param_selection": {
+    "enable": false
+  },
+  "preprocess": {
+    "find_peaks": {
+      "enable": false
+    }
+  },
+  "priors": {
+    "beta_center": 1.0,
+    "beta_sigma": 0.25,
+    "beta_strength": 1.0
+  }
+}
