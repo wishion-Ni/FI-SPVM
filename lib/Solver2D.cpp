@@ -55,6 +55,8 @@ void Solver2D::solve() {
     summary << "  max_iters=" << final_cfg.max_iters << '\n';
     summary << "  tol_primal=" << final_cfg.tol_primal << '\n';
     summary << "  tol_dual=" << final_cfg.tol_dual << '\n';
+    summary << "  converged=" << (optimizer.converged() ? "true" : "false") << '\n';
+    summary << "  iterations=" << optimizer.last_iterations() << '\n';
     debug_summary_ = summary.str();
 }
 

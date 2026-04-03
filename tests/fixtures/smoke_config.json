@@ -1,6 +1,6 @@
 {
   "data": {
-    "input_file": "tests/fixtures/smoke_input.csv",
+    "input_file": "smoke_input.csv",
     "noise_weighted": false,
     "input_type": "freq"
   },

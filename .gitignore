@@ -1,6 +1,9 @@
 # Build and test artifacts
 out/
 results/
+logs/
+build.log
+tests/fixtures/logs/
 
 # Repo-local dependency bootstrap
 vcpkg/

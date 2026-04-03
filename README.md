@@ -40,10 +40,8 @@ Windows (PowerShell):
 # first-time bootstrap
 .\scripts\bootstrap-vcpkg.ps1
 
-# auto generator selection
-cmake --preset dev-windows
-cmake --build --preset build-dev-windows --config Release
-ctest --preset test-dev-windows --output-on-failure
+# single workflow entry
+cmake --workflow --preset workflow-dev-windows
 ```
 
 If your machine needs explicit generator selection, use one of:
@@ -51,32 +49,43 @@ If your machine needs explicit generator selection, use one of:
 - `dev-windows-vs2022`
 - `dev-windows-vs2019`
 - `dev-windows-ninja`
+- `dev-windows-no-openmp`
 
 Linux (bash):
 
 ```bash
 bash ./scripts/bootstrap-vcpkg.sh
-cmake --preset dev-linux
-cmake --build --preset build-dev-linux
-ctest --preset test-dev-linux --output-on-failure
+cmake --workflow --preset workflow-dev-linux
+```
+
+Optional serial fallback validation:
+
+```powershell
+cmake --workflow --preset workflow-dev-windows-no-openmp
+```
+
+```bash
+cmake --workflow --preset workflow-dev-linux-no-openmp
 ```
 
 ## Run CLI
 
-```bash
-trspv_cli --conf config.json
+```powershell
+out/build/dev-windows/Release/trspv_cli.exe --conf config.json
 ```
 
 Compatible legacy form:
 
-```bash
-trspv_cli config.json
+```powershell
+out/build/dev-windows/Release/trspv_cli.exe --conf examples/basic_run/config.json
 ```
 
 ## Notes
 
 - The solver pipeline is unified through `SolverApp::run(argc, argv)`.
 - `src/trSPVSolver.cpp` is a compatibility placeholder and is not part of build targets.
+- Config paths are resolved relative to the config file location by default.
+- CLI overrides (`--input`, `--out`) are resolved relative to the invocation directory.
 
 ## Refactor task hub
 

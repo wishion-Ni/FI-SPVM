@@ -29,9 +29,7 @@ Windows:
 
 ```powershell
 .\scripts\bootstrap-vcpkg.ps1
-cmake --preset dev-windows
-cmake --build --preset build-dev-windows --config Release
-ctest --preset test-dev-windows --output-on-failure
+cmake --workflow --preset workflow-dev-windows
 ```
 
 Windows generator fallback presets (if needed):
@@ -39,14 +37,27 @@ Windows generator fallback presets (if needed):
 - `dev-windows-vs2022`
 - `dev-windows-vs2019`
 - `dev-windows-ninja`
+- `dev-windows-no-openmp`
 
 Linux:
 
 ```bash
 bash ./scripts/bootstrap-vcpkg.sh
-cmake --preset dev-linux
-cmake --build --preset build-dev-linux
-ctest --preset test-dev-linux --output-on-failure
+cmake --workflow --preset workflow-dev-linux
+```
+
+Optional serial fallback validation:
+
+Windows:
+
+```powershell
+cmake --workflow --preset workflow-dev-windows-no-openmp
+```
+
+Linux:
+
+```bash
+cmake --workflow --preset workflow-dev-linux-no-openmp
 ```
 
 ## Basic Run
@@ -55,6 +66,7 @@ Windows:
 
 ```powershell
 out/build/dev-windows/Release/trspv_cli.exe --conf config.json
+out/build/dev-windows/Release/trspv_cli.exe --conf examples/basic_run/config.json
 ```
 
 Linux:
@@ -82,3 +94,4 @@ If interpolation is enabled, additional interpolation comparison files are gener
 - Keep orchestration in `SolverApp`.
 - Keep file output logic in `ResultWriter`.
 - Keep config parsing and validation centralized in `ConfigLoader` / `validate_config`.
+- Config-relative paths are resolved against the config file directory.

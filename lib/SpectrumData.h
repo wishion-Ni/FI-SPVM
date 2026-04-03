@@ -1,42 +1,24 @@
-#pragma once
+ï»¿#pragma once
 
+#include <complex>
 #include <string>
 #include <vector>
-#include <complex>
 
 namespace trspv {
 
-    /// ÆµÆ×Êı¾İ½á¹¹£º´æ´¢ÆµÂÊ¡¢¸´ÊıĞÅºÅ¼°È¨ÖØ
-    struct SpectrumData {
-        std::vector<double>              freq;    // ÆµÂÊ (Hz)
-        std::vector<std::complex<double>> values;  // ¸´ÊıÏìÓ¦
-        std::vector<double>              weights; // È¨ÖØ (¿É»ùÓÚÔëÉù)
-    };
+struct SpectrumData {
+    std::vector<double> freq;
+    std::vector<std::complex<double>> values;
+    std::vector<double> weights;
+};
 
-    /// ÆµÆ×Êı¾İ¼ÓÔØÓëÔ¤´¦Àí
-    class SpectrumDataLoader {
-    public:
-        /**
-         * ¼ÓÔØ CSV ÆµÆ×Êı¾İ¡£
-         * ÎÄ¼ş¸ñÊ½£º
-         *  µÚ1ÁĞ£ºfreq (Hz) »ò period (s)£¬ÓÉ inputType Ö¸¶¨
-         *  µÚ2ÁĞ£ºÊµ²¿
-         *  µÚ3ÁĞ£ºĞé²¿
-         *  µÚ4ÁĞ£¨¿ÉÑ¡£©£ºÈ¨ÖØ
-         * @param path CSV ÎÄ¼şÂ·¾¶
-         * @param noiseWeighted ÊÇ·ñ¼ÓÔØµÚ4ÁĞÈ¨ÖØ
-         * @param inputType "freq" »ò "period"
-         * @return SpectrumData ¶ÔÏó
-         * @throws std::runtime_error ÎÄ¼ş´ò²»¿ª»ò½âÎö³ö´í
-         */
-        static SpectrumData load_csv(const std::string& path,
-            bool noiseWeighted,
-            const std::string& inputType = "freq");
+class SpectrumDataLoader {
+public:
+    static SpectrumData load_csv(const std::string& path,
+                                 bool noiseWeighted,
+                                 const std::string& inputType = "freq");
 
-        /**
-         * »ùÓÚ weights ¶Ô values ¼ÓÈ¨£ºvalues[i] *= sqrt(weights[i])
-         */
-        static void apply_weight(SpectrumData& data);
-    };
+    static void apply_weight(SpectrumData& data);
+};
 
-} // namespace trspv
+}  // namespace trspv

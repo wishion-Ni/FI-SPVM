@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <limits>
@@ -10,11 +11,19 @@
 
 namespace trspv {
 
+namespace {
+
+std::filesystem::path join_output(const std::string& output_dir, const char* filename) {
+    return std::filesystem::path(output_dir) / filename;
+}
+
+}  // namespace
+
 void ResultWriter::write_admm_summary(
     const std::string& output_dir,
     const std::string& debug_summary,
     const ParamSelectionResult& best) {
-    std::ofstream admm_out(output_dir + "/admm_summary.txt");
+    std::ofstream admm_out(join_output(output_dir, "admm_summary.txt"));
     admm_out << debug_summary;
     admm_out << "\nBest parameters: lambda1=" << best.lambda1
              << ", lambda_tv_tau=" << best.lambda_tv_tau
@@ -24,7 +33,7 @@ void ResultWriter::write_admm_summary(
 void ResultWriter::write_components(
     const std::string& output_dir,
     const std::vector<Component>& comps) {
-    std::ofstream ofs(output_dir + "/components.txt");
+    std::ofstream ofs(join_output(output_dir, "components.txt"));
     ofs << "# tau(s), beta, amp, prominence, it, jb\n";
     for (const auto& c : comps) {
         ofs << std::setprecision(12)
@@ -40,8 +49,8 @@ void ResultWriter::write_components(
 void ResultWriter::write_peak_seeds(
     const std::string& output_dir,
     const std::vector<double>& tau_seed) {
-    std::ofstream peak_out(output_dir + "/detected_peaks.txt");
-    peak_out << "# Detected " << tau_seed.size() << " peaks (tau in s) \n";
+    std::ofstream peak_out(join_output(output_dir, "detected_peaks.txt"));
+    peak_out << "# Detected " << tau_seed.size() << " peaks (tau in s)\n";
     for (double t : tau_seed) {
         peak_out << std::setprecision(12) << t << '\n';
     }
@@ -52,7 +61,7 @@ void ResultWriter::write_interpolation_outputs(
     const SpectrumData& raw_data,
     const SpectrumData& interp_data) {
     {
-        std::ofstream ofs(cfg.visualization.outputDir + "/original_data.csv");
+        std::ofstream ofs(join_output(cfg.visualization.outputDir, "original_data.csv"));
         ofs << "freq,real,imag,weight\n";
         for (size_t i = 0; i < raw_data.freq.size(); ++i) {
             ofs << std::setprecision(12) << raw_data.freq[i] << ','
@@ -62,7 +71,7 @@ void ResultWriter::write_interpolation_outputs(
         }
     }
     {
-        std::ofstream ofs(cfg.visualization.outputDir + "/interpolated_data.csv");
+        std::ofstream ofs(join_output(cfg.visualization.outputDir, "interpolated_data.csv"));
         ofs << "freq,real,imag\n";
         for (size_t i = 0; i < interp_data.freq.size(); ++i) {
             ofs << std::setprecision(12) << interp_data.freq[i] << ','
@@ -84,7 +93,7 @@ void ResultWriter::write_interpolation_outputs(
             return jbest;
         };
 
-        std::ofstream ofs(cfg.visualization.outputDir + "/interpolation_vs_original.csv");
+        std::ofstream ofs(join_output(cfg.visualization.outputDir, "interpolation_vs_original.csv"));
         ofs << "freq_raw,raw_real,raw_imag,freq_interp,interp_real,interp_imag,abs_error\n";
         for (size_t i = 0; i < raw_data.freq.size(); ++i) {
             const size_t j = nearest(raw_data.freq[i]);
@@ -113,8 +122,8 @@ void ResultWriter::write_transient_outputs(
     }
 
     {
-        std::ofstream on_tot(cfg.visualization.outputDir + "/transient_on_total.csv");
-        std::ofstream off_tot(cfg.visualization.outputDir + "/transient_off_total.csv");
+        std::ofstream on_tot(join_output(cfg.visualization.outputDir, "transient_on_total.csv"));
+        std::ofstream off_tot(join_output(cfg.visualization.outputDir, "transient_off_total.csv"));
         on_tot << "t,SPV\n";
         off_tot << "t,SPV\n";
         for (double t : ts) {
@@ -130,8 +139,10 @@ void ResultWriter::write_transient_outputs(
     }
 
     for (size_t k = 0; k < comps.size(); ++k) {
-        std::ofstream on_k(cfg.visualization.outputDir + "/transient_on_comp_" + std::to_string(k + 1) + ".csv");
-        std::ofstream off_k(cfg.visualization.outputDir + "/transient_off_comp_" + std::to_string(k + 1) + ".csv");
+        std::ofstream on_k(std::filesystem::path(cfg.visualization.outputDir) /
+                           ("transient_on_comp_" + std::to_string(k + 1) + ".csv"));
+        std::ofstream off_k(std::filesystem::path(cfg.visualization.outputDir) /
+                            ("transient_off_comp_" + std::to_string(k + 1) + ".csv"));
         on_k << "t,SPV\n";
         off_k << "t,SPV\n";
         for (double t : ts) {
@@ -217,7 +228,7 @@ void ResultWriter::write_metrics(
     metrics["AIC"] = aic;
     metrics["BIC"] = bic;
 
-    std::ofstream metrics_out(cfg.visualization.outputDir + "/metrics.json");
+    std::ofstream metrics_out(join_output(cfg.visualization.outputDir, "metrics.json"));
     metrics_out << metrics.dump(2) << std::endl;
 
     json summary;
@@ -239,7 +250,7 @@ void ResultWriter::write_metrics(
         arr.push_back(c);
     }
 
-    std::ofstream summary_out(cfg.visualization.outputDir + "/summary.json");
+    std::ofstream summary_out(join_output(cfg.visualization.outputDir, "summary.json"));
     summary_out << summary.dump(2) << std::endl;
 }
 

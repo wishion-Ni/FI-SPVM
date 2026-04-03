@@ -27,6 +27,9 @@ public:
     /// Update regularization parameters without recomputing matrix factors
     void updateParams(const ADMMConfig& cfg);
 
+    int last_iterations() const;
+    bool converged() const;
+
     tuple<ComplexVec, ComplexVec, ComplexVec, ComplexVec, ComplexVec>
     solveWarmStart(const ComplexVec& x0,
                    const ComplexVec& z1_0,
@@ -49,6 +52,16 @@ private:
                           const ComplexVec& u2) const;
     void updateZ1(const ComplexVec& x, const ComplexVec& u1, ComplexVec& z1) const;
     void updateZ2(const ComplexVec& x, const ComplexVec& u2, ComplexVec& z2) const;
+    void refactorize();
+    double compute_primal_residual(
+        const ComplexVec& x,
+        const ComplexVec& z1,
+        const ComplexVec& z2) const;
+    double compute_dual_residual(
+        const ComplexVec& z1,
+        const ComplexVec& z1_prev,
+        const ComplexVec& z2,
+        const ComplexVec& z2_prev) const;
 
     Eigen::MatrixXcd A_; ///< Design matrix
     ComplexVec b_;       ///< Observations
@@ -61,6 +74,8 @@ private:
     int gammaStride_;
 
     Eigen::LDLT<Eigen::MatrixXcd> solver_;
+    int last_iterations_ = 0;
+    bool converged_ = false;
 };
 
 } // namespace trspv

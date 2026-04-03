@@ -1,20 +1,19 @@
-// Utils.h
+ï»¿// Utils.h
 #pragma once
 
 #include <Eigen/Sparse>
 
 namespace trspv {
 
-	// ¹¹ÔìÒ»Î¬²î·Ö¾ØÕó D (n-1)¡Án
-	Eigen::SparseMatrix<double> build1DDiff(int n);
+// Build the 1D difference matrix D with shape (n - 1) x n.
+Eigen::SparseMatrix<double> build1DDiff(int n);
 
-	// ¹¹Ôì¶þÎ¬ TV ²î·Ö¾ØÕó D2D = [ kron(D¦Ó, I¦Â) ; kron(I¦Ó, D¦Â) ]
-	// ·µ»ØÐÐÊý = (Ntau-1)*Nbeta + Ntau*(Nbeta-1)£¬ÁÐÊý = Ntau*Nbeta
-	Eigen::SparseMatrix<double> build2DTV(int Ntau, int Nbeta);
+// Build the 2D TV matrix D2D = [ kron(Dtau, Ibeta) ; kron(Itau, Dbeta) ].
+// Rows = (Ntau - 1) * Nbeta + Ntau * (Nbeta - 1), cols = Ntau * Nbeta.
+Eigen::SparseMatrix<double> build2DTV(int Ntau, int Nbeta);
 
-	void scaleTVBySteps(Eigen::SparseMatrix<double>& D2D,
-		int Ntau, int Nbeta,
-		double dlogtau, double dbeta);
+void scaleTVBySteps(Eigen::SparseMatrix<double>& D2D,
+    int Ntau, int Nbeta,
+    double dlogtau, double dbeta);
 
 } // namespace trspv
-

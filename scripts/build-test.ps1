@@ -15,10 +15,10 @@ try {
     }
 
     $candidates = @(
-        @{ Configure = "dev-windows"; Build = "build-dev-windows"; Test = "test-dev-windows" },
-        @{ Configure = "dev-windows-vs2022"; Build = "build-dev-windows-vs2022"; Test = "test-dev-windows-vs2022" },
-        @{ Configure = "dev-windows-vs2019"; Build = "build-dev-windows-vs2019"; Test = "test-dev-windows-vs2019" },
-        @{ Configure = "dev-windows-ninja"; Build = "build-dev-windows-ninja"; Test = "test-dev-windows-ninja" }
+        @{ Configure = "dev-windows"; Workflow = "workflow-dev-windows" },
+        @{ Configure = "dev-windows-vs2022"; Workflow = "workflow-dev-windows-vs2022" },
+        @{ Configure = "dev-windows-vs2019"; Workflow = "workflow-dev-windows-vs2019" },
+        @{ Configure = "dev-windows-ninja"; Workflow = "workflow-dev-windows-ninja" }
     )
 
     $selected = $null
@@ -36,16 +36,10 @@ try {
         throw "All Windows configure presets failed."
     }
 
-    Write-Host "Using build preset: $($selected.Build)"
-    & cmake --build --preset $selected.Build --config Release
+    Write-Host "Using workflow preset: $($selected.Workflow)"
+    & cmake --workflow --preset $selected.Workflow
     if ($LASTEXITCODE -ne 0) {
-        throw "Build failed with preset '$($selected.Build)'."
-    }
-
-    Write-Host "Using test preset: $($selected.Test)"
-    & ctest --preset $selected.Test --output-on-failure
-    if ($LASTEXITCODE -ne 0) {
-        throw "Tests failed with preset '$($selected.Test)'."
+        throw "Workflow failed with preset '$($selected.Workflow)'."
     }
 
     Write-Host "Build and tests completed successfully."

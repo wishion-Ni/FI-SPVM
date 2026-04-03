@@ -1,23 +1,23 @@
-#pragma once
+ï»¿#pragma once
 
-#include "SpectrumData.h"
 #include "Config.h"
+#include "SpectrumData.h"
+
 #include <string>
 
 namespace trspv {
 
-
-    /// ²åÖµ/²¹µãÄ£¿é
-    class SpectrumCompletion {
-    public:
-        /**
-         * ¸ù¾İÅäÖÃ¶ÔÔ­Ê¼ÆµÆ×Êı¾İ½øĞĞ²åÖµ²¹µã
-         * @param data Ô­Ê¼Êı¾İ£¨ÒÑ¼ÓÔØ£©
-         * @param config ²åÖµÅäÖÃ
-         * @return ²¹µãºóµÄÍêÕûÊı¾İ
-         */
-        static SpectrumData complete(const SpectrumData& data,
-            const SpectrumCompletionConfig& config);
-    };
+/// Interpolation and completion module.
+class SpectrumCompletion {
+public:
+    /**
+     * Complete the original spectrum data according to the interpolation config.
+     * data: input spectrum samples.
+     * config: interpolation/completion settings.
+     * Returns the completed spectrum.
+     */
+    static SpectrumData complete(const SpectrumData& data,
+        const SpectrumCompletionConfig& config);
+};
 
 } // namespace trspv

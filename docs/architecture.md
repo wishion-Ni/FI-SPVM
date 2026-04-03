@@ -24,11 +24,12 @@ Compatibility file `src/trSPVSolver.cpp` is intentionally not part of build targ
 
 1. `main` forwards CLI arguments to `SolverApp::run`.
 2. `ConfigLoader::from_file` loads and validates the JSON configuration.
-3. `SolverApp` loads input spectra and optionally runs interpolation/completion.
-4. `SolverApp` builds the dictionary matrix, TV operator, and ADMM scan settings.
-5. `Solver2D` performs optional parameter scanning and the final optimization.
-6. `ComponentAnalysis` extracts domain components from the solved 2D distribution.
-7. `ResultWriter` emits backward-compatible output files.
+3. `ConfigLoader` resolves config-relative paths for input, logging, and outputs.
+4. `SolverApp` loads input spectra and optionally runs interpolation/completion.
+5. `SolverApp` builds the dictionary matrix, TV operator, and ADMM scan settings.
+6. `Solver2D` performs optional parameter scanning and the final optimization.
+7. `ComponentAnalysis` extracts domain components from the solved 2D distribution.
+8. `ResultWriter` emits backward-compatible output files.
 
 ## Module Responsibilities
 
@@ -64,9 +65,12 @@ Compatibility file `src/trSPVSolver.cpp` is intentionally not part of build targ
 ## Test Layering
 
 - `config_tests`: verifies config parsing compatibility and validation behavior.
+- `loader_tests`: verifies CSV parsing, input type handling, and weighting semantics.
+- `completion_tests`: verifies interpolation behavior on tiny fixtures.
+- `solver_tests`: verifies ADMM convergence and deterministic scan behavior.
 - `cli_smoke_test`: executes the solver path with fixture input and checks key output files.
 
 ## Notes
 
 - OpenMP is an optional acceleration path. When unavailable, build falls back to serial scans.
-- `ParamSelector` currently returns only the best parameter set; structured scan exports are not implemented yet.
+- `ParamSelector` writes a machine-readable `param_selection_report.json` into the configured scan output directory.

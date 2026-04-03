@@ -20,6 +20,10 @@ jobs:
             configure_preset: dev-linux
             build_preset: build-dev-linux
             test_preset: test-dev-linux
+          - os: ubuntu-latest
+            configure_preset: dev-linux-no-openmp
+            build_preset: build-dev-linux-no-openmp
+            test_preset: test-dev-linux-no-openmp
 
     steps:
       - name: Checkout

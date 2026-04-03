@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -62,6 +63,37 @@ void require_less(double lhs, double rhs, const char* lhs_name, const char* rhs_
         throw std::runtime_error(
             std::string(lhs_name) + " must be < " + rhs_name + ", got " +
             as_string(lhs) + " and " + as_string(rhs));
+    }
+}
+
+std::string normalize_path_string(const std::filesystem::path& path) {
+    return path.lexically_normal().make_preferred().string();
+}
+
+std::string resolve_path_if_relative(const std::string& raw, const std::filesystem::path& base_dir) {
+    if (raw.empty()) {
+        return raw;
+    }
+    const std::filesystem::path path(raw);
+    if (path.is_absolute()) {
+        return normalize_path_string(path);
+    }
+    return normalize_path_string(std::filesystem::absolute(base_dir / path));
+}
+
+void resolve_config_paths(trspv::Config& cfg, const std::filesystem::path& config_path) {
+    const std::filesystem::path config_dir = config_path.parent_path();
+    cfg.source_path = normalize_path_string(config_path);
+    cfg.source_dir = normalize_path_string(config_dir);
+
+    cfg.inputFile = resolve_path_if_relative(cfg.inputFile, config_dir);
+    cfg.visualization.outputDir = resolve_path_if_relative(cfg.visualization.outputDir, config_dir);
+    cfg.logging.file = resolve_path_if_relative(cfg.logging.file, config_dir);
+
+    if (cfg.param_selection.outputDir.empty()) {
+        cfg.param_selection.outputDir = cfg.visualization.outputDir;
+    } else {
+        cfg.param_selection.outputDir = resolve_path_if_relative(cfg.param_selection.outputDir, config_dir);
     }
 }
 
@@ -158,6 +190,12 @@ void from_json(const json& j, ParamSelectionConfig& cfg) {
     cfg.scan_max_iters = j.value("scan_max_iters", cfg.scan_max_iters);
     cfg.scan_tol = j.value("scan_tol", cfg.scan_tol);
     cfg.refine_after = j.value("refine_after", cfg.refine_after);
+    cfg.auto_lambda1_range = j.value("auto_lambda1_range", cfg.auto_lambda1_range);
+    cfg.auto_lambdat_range = j.value("auto_lambdat_range", cfg.auto_lambdat_range);
+    cfg.auto_lambdab_range = j.value("auto_lambdab_range", cfg.auto_lambdab_range);
+    cfg.has_lambda1_range = j.contains("lambda1_min") && j.contains("lambda1_max");
+    cfg.has_lambdat_range = j.contains("lambdat_min") && j.contains("lambdat_max");
+    cfg.has_lambdab_range = j.contains("lambdab_min") && j.contains("lambdab_max");
 }
 
 void from_json(const json& j, Config& cfg) {
@@ -176,15 +214,17 @@ void from_json(const json& j, Config& cfg) {
     if (j.contains("param_selection")) j.at("param_selection").get_to(cfg.param_selection);
     if (j.contains("preprocess")) j.at("preprocess").get_to(cfg.preprocess);
     if (j.contains("priors")) j.at("priors").get_to(cfg.priors);
-
-    if (cfg.param_selection.outputDir.empty()) {
-        cfg.param_selection.outputDir = cfg.visualization.outputDir;
-    }
 }
 
 void validate_config(const Config& cfg) {
     if (cfg.inputFile.empty()) {
         throw std::runtime_error("data.input_file must not be empty");
+    }
+
+    const std::string input_type = to_lower(cfg.spectrum_input_type);
+    if (input_type != "freq" && input_type != "period") {
+        throw std::runtime_error(
+            "data.input_type must be one of: freq, period; got " + cfg.spectrum_input_type);
     }
 
     require_positive(cfg.kernel.tau_min, "kernel.tau_min");
@@ -229,11 +269,18 @@ void validate_config(const Config& cfg) {
     require_positive(cfg.priors.beta_sigma, "priors.beta_sigma");
     require_non_negative(cfg.priors.beta_strength, "priors.beta_strength");
 
+    if (cfg.logging.file.empty()) {
+        throw std::runtime_error("logging.file must not be empty");
+    }
     if (cfg.visualization.outputDir.empty()) {
         throw std::runtime_error("visualization.outputDir must not be empty");
     }
     require_positive(cfg.visualization.transient_tmax, "visualization.transient_tmax");
     require_at_least(cfg.visualization.transient_samples, 2, "visualization.transient_samples");
+
+    if (cfg.param_selection.outputDir.empty()) {
+        throw std::runtime_error("param_selection.outputDir must not be empty");
+    }
 
     if (cfg.param_selection.enable) {
         require_at_least(cfg.param_selection.num_lambda1, 1, "param_selection.num_lambda1");
@@ -266,7 +313,8 @@ void validate_config(const Config& cfg) {
 }
 
 Config ConfigLoader::from_file(const std::string& path) {
-    std::ifstream ifs(path);
+    const std::filesystem::path config_path = std::filesystem::absolute(path);
+    std::ifstream ifs(config_path);
     if (!ifs.is_open()) {
         throw std::runtime_error("unable to open config file: " + path);
     }
@@ -300,6 +348,8 @@ Config ConfigLoader::from_file(const std::string& path) {
     } catch (const json::exception& e) {
         throw std::runtime_error(std::string("failed to load config fields: ") + e.what());
     }
+
+    resolve_config_paths(cfg, config_path);
 
     if (used_legacy_mapping) {
         std::cerr << "[Config] warning: using legacy top-level keys; prefer the nested data.* layout.\n";

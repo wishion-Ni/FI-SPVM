@@ -1,15 +1,15 @@
-#pragma once
+ï»¿#pragma once
 #include <complex>
 
 namespace trspv {
 
-    /// @brief ºËº¯Êý H(¦Ø; ¦Ó, ¦Ã) = 1 / (1 + (i¡¤¦Ø¡¤¦Ó)^¦Ã)
+    /// Kernel H(omega; tau, gamma) = 1 / (1 + (i * omega * tau)^gamma).
     class KernelFunction {
     public:
-        /// @param omega ½ÇÆµÂÊ ¦Ø (rad/s)
-        /// @param tau   ³ÚÔ¥Ê±¼ä ¦Ó (s)
-        /// @param gamma ÃÝÖ¸Êý ¦Ã (ÎÞÁ¿¸Ù)
-        /// @return      ¸´ÊýÖµ H(¦Ø; ¦Ó, ¦Ã)
+        /// omega: angular frequency in rad/s.
+        /// tau_center: relaxation time center in seconds.
+        /// gamma: fractional exponent.
+        /// Returns the complex kernel response.
         static std::complex<double> evaluate(double omega,
             double tau_row,
             double tau_center,

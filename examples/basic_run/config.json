@@ -1,6 +1,6 @@
 {
   "data": {
-    "input_file": "examples/basic_run/input.csv",
+    "input_file": "input.csv",
     "noise_weighted": false,
     "input_type": "freq"
   },
@@ -38,7 +38,7 @@
   },
   "visualization": {
     "enabled": true,
-    "outputDir": "results/basic_run",
+    "outputDir": "results",
     "transient_tmax": 0.1,
     "transient_samples": 16
   },

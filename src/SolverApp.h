@@ -8,6 +8,7 @@
 
 #include "../lib/Config.h"
 #include "../lib/ComponentAnalysis.h"
+#include "../lib/Solver2D.h"
 #include "../lib/SpectrumData.h"
 
 class SolverApp {
@@ -23,7 +24,9 @@ private:
 
     CliOptions parse_arguments(int argc, char** argv) const;
     trspv::Config load_config(const CliOptions& opts) const;
+    void initialize_logging(const trspv::Config& cfg) const;
     void ensure_output_dir(const std::string& dir) const;
+    std::string resolve_cli_path(const std::string& raw) const;
 
     trspv::SpectrumData load_and_maybe_complete(
         const trspv::Config& cfg,
@@ -50,6 +53,32 @@ private:
     trspv::ADMMConfig make_scan_config(
         const trspv::Config& cfg,
         const std::vector<double>& l1w2d) const;
+
+    trspv::DictionaryConfig make_dictionary_config(
+        const trspv::Config& cfg,
+        const std::vector<double>& taus,
+        const std::vector<double>& betas) const;
+
+    void derive_param_selection_ranges(
+        trspv::Config& cfg,
+        const Eigen::MatrixXcd& A,
+        const Eigen::VectorXcd& b,
+        const std::vector<double>& l1w2d,
+        int Nt,
+        int Nb,
+        double dlogt,
+        double dbeta,
+        const trspv::DictionaryConfig& dcfg) const;
+
+    void write_outputs(
+        const trspv::Config& cfg,
+        const trspv::SpectrumData& data,
+        const std::vector<double>& taus,
+        const std::vector<double>& betas,
+        const Eigen::VectorXcd& x2d,
+        const Eigen::MatrixXcd& A,
+        const std::vector<trspv::Component>& comps,
+        const trspv::Solver2D& solver) const;
 
     double compute_lambda1_max(
         const Eigen::MatrixXcd& A,

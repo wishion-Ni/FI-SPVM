@@ -53,6 +53,14 @@
       }
     },
     {
+      "name": "dev-windows-no-openmp",
+      "displayName": "Dev Windows (No OpenMP)",
+      "inherits": "dev-windows-base",
+      "cacheVariables": {
+        "FI_SPVM_ENABLE_OPENMP": "OFF"
+      }
+    },
+    {
       "name": "dev-linux",
       "displayName": "Dev Linux",
       "inherits": "dev-base",
@@ -64,6 +72,15 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
+      }
+    },
+    {
+      "name": "dev-linux-no-openmp",
+      "displayName": "Dev Linux (No OpenMP)",
+      "inherits": "dev-linux",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "FI_SPVM_ENABLE_OPENMP": "OFF"
       }
     }
   ],
@@ -88,8 +105,17 @@
       "configurePreset": "dev-windows-ninja"
     },
     {
+      "name": "build-dev-windows-no-openmp",
+      "configurePreset": "dev-windows-no-openmp",
+      "configuration": "Release"
+    },
+    {
       "name": "build-dev-linux",
       "configurePreset": "dev-linux"
+    },
+    {
+      "name": "build-dev-linux-no-openmp",
+      "configurePreset": "dev-linux-no-openmp"
     }
   ],
   "testPresets": [
@@ -125,11 +151,147 @@
       }
     },
     {
+      "name": "test-dev-windows-no-openmp",
+      "configurePreset": "dev-windows-no-openmp",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
       "name": "test-dev-linux",
       "configurePreset": "dev-linux",
       "output": {
         "outputOnFailure": true
       }
+    },
+    {
+      "name": "test-dev-linux-no-openmp",
+      "configurePreset": "dev-linux-no-openmp",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "workflow-dev-windows",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "dev-windows"
+        },
+        {
+          "type": "build",
+          "name": "build-dev-windows"
+        },
+        {
+          "type": "test",
+          "name": "test-dev-windows"
+        }
+      ]
+    },
+    {
+      "name": "workflow-dev-windows-vs2022",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "dev-windows-vs2022"
+        },
+        {
+          "type": "build",
+          "name": "build-dev-windows-vs2022"
+        },
+        {
+          "type": "test",
+          "name": "test-dev-windows-vs2022"
+        }
+      ]
+    },
+    {
+      "name": "workflow-dev-windows-vs2019",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "dev-windows-vs2019"
+        },
+        {
+          "type": "build",
+          "name": "build-dev-windows-vs2019"
+        },
+        {
+          "type": "test",
+          "name": "test-dev-windows-vs2019"
+        }
+      ]
+    },
+    {
+      "name": "workflow-dev-windows-ninja",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "dev-windows-ninja"
+        },
+        {
+          "type": "build",
+          "name": "build-dev-windows-ninja"
+        },
+        {
+          "type": "test",
+          "name": "test-dev-windows-ninja"
+        }
+      ]
+    },
+    {
+      "name": "workflow-dev-windows-no-openmp",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "dev-windows-no-openmp"
+        },
+        {
+          "type": "build",
+          "name": "build-dev-windows-no-openmp"
+        },
+        {
+          "type": "test",
+          "name": "test-dev-windows-no-openmp"
+        }
+      ]
+    },
+    {
+      "name": "workflow-dev-linux",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "dev-linux"
+        },
+        {
+          "type": "build",
+          "name": "build-dev-linux"
+        },
+        {
+          "type": "test",
+          "name": "test-dev-linux"
+        }
+      ]
+    },
+    {
+      "name": "workflow-dev-linux-no-openmp",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "dev-linux-no-openmp"
+        },
+        {
+          "type": "build",
+          "name": "build-dev-linux-no-openmp"
+        },
+        {
+          "type": "test",
+          "name": "test-dev-linux-no-openmp"
+        }
+      ]
     }
   ]
 }

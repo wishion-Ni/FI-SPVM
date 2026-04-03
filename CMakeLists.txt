@@ -78,8 +78,20 @@ if(BUILD_TESTING)
     target_link_libraries(config_tests PRIVATE fi_spvm_core GTest::gtest_main)
     gtest_discover_tests(config_tests DISCOVERY_MODE PRE_TEST)
 
+    add_executable(loader_tests tests/loader_tests.cpp)
+    target_link_libraries(loader_tests PRIVATE fi_spvm_core GTest::gtest_main)
+    gtest_discover_tests(loader_tests DISCOVERY_MODE PRE_TEST)
+
+    add_executable(completion_tests tests/completion_tests.cpp)
+    target_link_libraries(completion_tests PRIVATE fi_spvm_core GTest::gtest_main)
+    gtest_discover_tests(completion_tests DISCOVERY_MODE PRE_TEST)
+
+    add_executable(solver_tests tests/solver_tests.cpp)
+    target_link_libraries(solver_tests PRIVATE fi_spvm_core GTest::gtest_main)
+    gtest_discover_tests(solver_tests DISCOVERY_MODE PRE_TEST)
+
     add_executable(cli_smoke_test tests/cli_smoke_test.cpp)
-    target_link_libraries(cli_smoke_test PRIVATE fi_spvm_app)
+    target_link_libraries(cli_smoke_test PRIVATE fi_spvm_app nlohmann_json::nlohmann_json)
     file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}" FI_SPVM_SOURCE_DIR_CMAKE)
     target_compile_definitions(cli_smoke_test
         PRIVATE

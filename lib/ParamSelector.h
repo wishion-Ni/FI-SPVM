@@ -1,38 +1,28 @@
-// ParamSelector.h
-#pragma once
+Ôªø#pragma once
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+
 #include "Config.h"
 
 namespace trspv {
 
-    /// ◊‘∂Ø≤Œ ˝—°‘Ò£∫…®√Ë ¶À1°¢¶À¶”°¢¶À¶¬ ≤¢”√ L-curve π’µ„∑®—°◊Ó”≈ ¶À1
-    class ParamSelector {
-    public:
-        /**
-         * @param A       M°¡N ◊÷µ‰æÿ’Û
-         * @param b       M Œ¨π€≤‚œÚ¡ø
-         * @param D       TV ≤Ó∑÷À„◊”æÿ’Û
-         * @param baseCfg ª˘¥° ADMM ≈‰÷√£®±£¡Ù ¶À¶”°¢¶À¶¬°¢¶— µ»£©
-         * @param psc     ◊‘∂Ø≤Œ ˝—°‘Ò≈‰÷√
-         */
-        ParamSelector(const Eigen::MatrixXcd& A,
-            const Eigen::VectorXcd& b,
-            const Eigen::SparseMatrix<double>& D,
-            const ADMMConfig& baseCfg,
-            const ParamSelectionConfig& psc);
-        /// …®√Ë 3D Õ¯∏Ò£¨ ‰≥ˆ lcurve.csv£¨∑µªÿ◊Ó”≈ ADMMConfig
-        ADMMConfig select() const;
+class ParamSelector {
+public:
+    ParamSelector(const Eigen::MatrixXcd& A,
+                  const Eigen::VectorXcd& b,
+                  const Eigen::SparseMatrix<double>& D,
+                  const ADMMConfig& baseCfg,
+                  const ParamSelectionConfig& psc);
 
-    private:
-        
+    ADMMConfig select() const;
 
-        Eigen::MatrixXcd            A_;
-        Eigen::VectorXcd            b_;
-        Eigen::SparseMatrix<double> D_;
-        ADMMConfig                  baseCfg_;
-        ParamSelectionConfig        psc_;
-    };
+private:
+    Eigen::MatrixXcd A_;
+    Eigen::VectorXcd b_;
+    Eigen::SparseMatrix<double> D_;
+    ADMMConfig baseCfg_;
+    ParamSelectionConfig psc_;
+};
 
-} // namespace trspv
+}  // namespace trspv
