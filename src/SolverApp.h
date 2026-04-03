@@ -29,11 +29,6 @@ private:
         const trspv::Config& cfg,
         trspv::SpectrumData& rawData) const;
 
-    void write_interpolation_outputs(
-        const trspv::Config& cfg,
-        const trspv::SpectrumData& rawData,
-        const trspv::SpectrumData& interpData) const;
-
     std::vector<double> build_tau_grid(
         const trspv::Config& cfg,
         const trspv::SpectrumData& data,
@@ -64,18 +59,5 @@ private:
         int Nb,
         const trspv::DictionaryConfig& dcfg,
         const trspv::Config& cfg) const;
-
-    void write_transient_outputs(
-        const trspv::Config& cfg,
-        const std::vector<trspv::Component>& comps) const;
-
-    void write_metrics(
-        const trspv::Config& cfg,
-        const trspv::SpectrumData& data,
-        const std::vector<double>& taus,
-        const std::vector<double>& betas,
-        const Eigen::VectorXcd& x2d,
-        const Eigen::MatrixXcd& A,
-        const std::vector<trspv::Component>& comps) const;
 };
 

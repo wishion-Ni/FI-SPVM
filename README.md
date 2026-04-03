@@ -3,9 +3,19 @@
 This repository is organized into two directories:
 
 - `lib/`: Core library headers and implementations for the spectral variational model.
-- `src/`: Application entry points and executables (e.g., `trSPVSolver.cpp`).
+- `src/`: Application orchestration code, including `SolverApp`.
+- `apps/`: Thin executable entry points such as `apps/trspv_cli/main.cpp`.
 
 Configuration samples (`config.json`) remain at the repository root.
+
+## Unified entry
+
+The CLI entry has been converged to a thin `main` in `apps/trspv_cli/main.cpp`.
+Argument parsing, config loading, solver orchestration, and output generation now
+flow through `SolverApp::run(argc, argv)` only.
+
+`src/trSPVSolver.cpp` is kept as a temporary compatibility placeholder so older
+build references do not immediately break, but it no longer owns solver logic.
 
 ## Refactor task hub
 

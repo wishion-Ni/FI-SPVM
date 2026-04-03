@@ -18,6 +18,7 @@
 #include "../lib/Logger.h"
 #include "../lib/ParamSelector.h"
 #include "../lib/PeakSeedDetector.h"
+#include "../lib/ResultWriter.h"
 #include "../lib/Solver2D.h"
 #include "../lib/SpectrumCompletion.h"
 #include "../lib/Utils.h"
@@ -34,7 +35,7 @@ std::string format_usage() {
     return
         "Usage:\n"
         "  trspv --conf config.json [--input data.csv] [--out results/runX]\n"
-        "  trspv config.json  # 兼容旧用法\n";
+        "  trspv config.json  # compatible legacy form\n";
 }
 
 }  // namespace
@@ -110,31 +111,11 @@ int SolverApp::run(int argc, char** argv) const {
     Eigen::VectorXcd x2d = solver.best_solution();
     ParamSelectionResult best = solver.best_result();
 
-    std::ofstream admmOut(cfg.visualization.outputDir + "/admm_summary.txt");
-    admmOut << solver.debug_summary();
-    admmOut << "\nBest parameters: lambda1=" << best.lambda1
-            << ", lambda_tv_tau=" << best.lambda_tv_tau
-            << ", lambda_tv_beta=" << best.lambda_tv_beta << '\n';
-
     auto comps = extract_components(x2d, taus, betas);
-
-    {
-        std::ofstream ofs(cfg.visualization.outputDir + "/components.txt");
-        ofs << "# tau(s), beta, amp, prominence, it, jb\n";
-        for (size_t i = 0; i < comps.size(); ++i) {
-            const auto& c = comps[i];
-            ofs << std::setprecision(12)
-                << c.tau << ','.
-                << c.beta << ','.
-                << c.amp << ','.
-                << c.prominence << ','
-                << c.it << ','
-                << c.jb << '\n';
-        }
-    }
-
-    write_transient_outputs(cfg, comps);
-    write_metrics(cfg, data, taus, betas, x2d, A, comps);
+    ResultWriter::write_admm_summary(cfg.visualization.outputDir, solver.debug_summary(), best);
+    ResultWriter::write_components(cfg.visualization.outputDir, comps);
+    ResultWriter::write_transient_outputs(cfg, comps);
+    ResultWriter::write_metrics(cfg, data, taus, betas, x2d, A, comps);
 
     std::cout << "All results written to " << cfg.visualization.outputDir << std::endl;
     return 0;
@@ -146,7 +127,7 @@ SolverApp::CliOptions SolverApp::parse_arguments(int argc, char** argv) const {
         std::string arg = argv[i];
         auto next = [&](int& idx) -> const char* {
             if (idx + 1 < argc) return argv[++idx];
-            throw std::runtime_error("缺少参数值: " + arg);
+            throw std::runtime_error("missing value for argument: " + arg);
         };
 
         if (arg == "--conf" || arg == "-c") {
@@ -182,61 +163,8 @@ SpectrumData SolverApp::load_and_maybe_complete(const Config& cfg, SpectrumData&
 
     SpectrumCompletion completion;
     SpectrumData interpData = completion.complete(rawData, cfg.completion);
-    write_interpolation_outputs(cfg, rawData, interpData);
+    ResultWriter::write_interpolation_outputs(cfg, rawData, interpData);
     return interpData;
-}
-
-void SolverApp::write_interpolation_outputs(
-    const Config& cfg,
-    const SpectrumData& rawData,
-    const SpectrumData& interpData) const {
-    {
-        std::ofstream ofs(cfg.visualization.outputDir + "/original_data.csv");
-        ofs << "freq,real,imag,weight\n";
-        for (size_t i = 0; i < rawData.freq.size(); ++i) {
-            ofs << std::setprecision(12) << rawData.freq[i] << ','
-                << rawData.values[i].real() << ','
-                << rawData.values[i].imag() << ','
-                << (i < rawData.weights.size() ? rawData.weights[i] : 1.0) << '\n';
-        }
-    }
-    {
-        std::ofstream ofs(cfg.visualization.outputDir + "/interpolated_data.csv");
-        ofs << "freq,real,imag\n";
-        for (size_t i = 0; i < interpData.freq.size(); ++i) {
-            ofs << std::setprecision(12) << interpData.freq[i] << ','
-                << interpData.values[i].real() << ','
-                << interpData.values[i].imag() << '\n';
-        }
-    }
-    {
-        auto nearest = [&](double f) {
-            size_t jbest = 0;
-            double dmin = std::numeric_limits<double>::infinity();
-            for (size_t j = 0; j < interpData.freq.size(); ++j) {
-                double d = std::abs(interpData.freq[j] - f);
-                if (d < dmin) {
-                    dmin = d;
-                    jbest = j;
-                }
-            }
-            return jbest;
-        };
-        std::ofstream ofs(cfg.visualization.outputDir + "/interpolation_vs_original.csv");
-        ofs << "freq_raw,raw_real,raw_imag,freq_interp,interp_real,interp_imag,abs_error\n";
-        for (size_t i = 0; i < rawData.freq.size(); ++i) {
-            size_t j = nearest(rawData.freq[i]);
-            std::complex<double> e = interpData.values[j] - rawData.values[i];
-            ofs << std::setprecision(12)
-                << rawData.freq[i] << ','
-                << rawData.values[i].real() << ','
-                << rawData.values[i].imag() << ','
-                << interpData.freq[j] << ','
-                << interpData.values[j].real() << ','
-                << interpData.values[j].imag() << ','
-                << std::abs(e) << '\n';
-        }
-    }
 }
 
 std::vector<double> SolverApp::build_tau_grid(
@@ -265,9 +193,7 @@ std::vector<double> SolverApp::build_tau_grid(
 
         std::vector<double> tauSeed = detector(data.freq, data.values);
 
-        std::ofstream peakOut(cfg.visualization.outputDir + "/detected_peaks.txt");
-        peakOut << "# Detected " << tauSeed.size() << " peaks (tau in s) \n";
-        for (double t : tauSeed) peakOut << std::setprecision(12) << t << '\n';
+        ResultWriter::write_peak_seeds(cfg.visualization.outputDir, tauSeed);
         std::cout << "[PeakDetect] found " << tauSeed.size() << " peak(s)." << std::endl;
 
         taus.insert(taus.end(), tauSeed.begin(), tauSeed.end());
@@ -404,131 +330,4 @@ double SolverApp::compute_lambda1_max(
     return Lmax;
 }
 
-void SolverApp::write_transient_outputs(
-    const Config& cfg,
-    const std::vector<Component>& comps) const {
-    const double tmax = cfg.visualization.transient_tmax;
-    const int    num_samples = cfg.visualization.transient_samples;
-    std::vector<double> ts;
-    ts.reserve(static_cast<size_t>(num_samples));
-    for (int i = 0; i < num_samples; ++i) {
-        ts.push_back(tmax * i / double(num_samples - 1));
-    }
-
-    {
-        std::ofstream onTot(cfg.visualization.outputDir + "/transient_on_total.csv");
-        std::ofstream offTot(cfg.visualization.outputDir + "/transient_off_total.csv");
-        onTot << "t,SPV\n";
-        offTot << "t,SPV\n";
-        for (double t : ts) {
-            double y_on = 0, y_off = 0;
-            for (auto& c : comps) {
-                y_on += c.amp * h_on(t, c.tau, c.beta);
-                y_off += c.amp * h_off(t, c.tau, c.beta);
-            }
-            onTot << std::setprecision(12) << t << ',' << y_on << '\n';
-            offTot << std::setprecision(12) << t << ',' << y_off << '\n';
-        }
-    }
-
-    for (size_t k = 0; k < comps.size(); ++k) {
-        std::ofstream onK(cfg.visualization.outputDir + "/transient_on_comp_" + std::to_string(k + 1) + ".csv");
-        std::ofstream offK(cfg.visualization.outputDir + "/transient_off_comp_" + std::to_string(k + 1) + ".csv");
-        onK << "t,SPV\n";
-        offK << "t,SPV\n";
-        for (double t : ts) {
-            double y_on = comps[k].amp * h_on(t, comps[k].tau, comps[k].beta);
-            double y_off = comps[k].amp * h_off(t, comps[k].tau, comps[k].beta);
-            onK << std::setprecision(12) << t << ',' << y_on << '\n';
-            offK << std::setprecision(12) << t << ',' << y_off << '\n';
-        }
-    }
-}
-
-void SolverApp::write_metrics(
-    const Config& cfg,
-    const SpectrumData& data,
-    const std::vector<double>& taus,
-    const std::vector<double>& betas,
-    const Eigen::VectorXcd& x2d,
-    const Eigen::MatrixXcd& A,
-    const std::vector<Component>& comps) const {
-    Eigen::VectorXcd b_pred = A * x2d;
-    const size_t N = data.freq.size();
-    auto w_of = [&](size_t i) { return (i < data.weights.size() ? data.weights[i] : 1.0); };
-
-    double rss_w = 0.0, wsum = 0.0;
-    double rss_r = 0.0, rss_i = 0.0, tss_r = 0.0, tss_i = 0.0;
-    double mean_r = 0.0, mean_i = 0.0, wsum_mean = 0.0;
-
-    for (size_t i = 0; i < N; ++i) {
-        double w = w_of(i);
-        mean_r += w * data.values[i].real();
-        mean_i += w * data.values[i].imag();
-        wsum_mean += w;
-    }
-    mean_r /= std::max(1e-16, wsum_mean);
-    mean_i /= std::max(1e-16, wsum_mean);
-
-    for (size_t i = 0; i < N; ++i) {
-        double w = w_of(i);
-        auto e = b_pred[static_cast<int>(i)] - data.values[i];
-        rss_w += w * std::norm(e);
-        wsum += w;
-
-        rss_r += w * std::pow(b_pred[static_cast<int>(i)].real() - data.values[i].real(), 2);
-        rss_i += w * std::pow(b_pred[static_cast<int>(i)].imag() - data.values[i].imag(), 2);
-        tss_r += w * std::pow(data.values[i].real() - mean_r, 2);
-        tss_i += w * std::pow(data.values[i].imag() - mean_i, 2);
-    }
-    double wrmse = std::sqrt(rss_w / std::max(1e-16, wsum));
-    double R2_real = 1.0 - rss_r / std::max(1e-16, tss_r);
-    double R2_imag = 1.0 - rss_i / std::max(1e-16, tss_i);
-
-    int nz = 0;
-    double thr_nz = 1e-6 * x2d.cwiseAbs().maxCoeff();
-    for (int k = 0; k < x2d.size(); ++k) if (std::abs(x2d[k]) > thr_nz) ++nz;
-    int nobs = int(2 * N);
-    int dof = std::max(1, nobs - nz);
-
-    double chi2_red = (rss_w / std::max(1e-16, wsum)) * (nobs / double(dof));
-    double RSS = 0.0; for (size_t i = 0; i < N; ++i) RSS += std::norm(b_pred[static_cast<int>(i)] - data.values[i]);
-    double AIC = 2.0 * nz + nobs * std::log(std::max(1e-300, RSS / nobs));
-    double BIC = nz * std::log(std::max(1, nobs)) + nobs * std::log(std::max(1e-300, RSS / nobs));
-
-    using json = nlohmann::json;
-    json mj;
-    mj["weighted_rmse"] = wrmse;
-    mj["R2_real"] = R2_real;
-    mj["R2_imag"] = R2_imag;
-    mj["chi2_reduced"] = chi2_red;
-    mj["nz_coeffs"] = nz;
-    mj["AIC"] = AIC;
-    mj["BIC"] = BIC;
-    std::ofstream jm(cfg.visualization.outputDir + "/metrics.json");
-    jm << mj.dump(2) << std::endl;
-
-    json sj;
-    sj["num_points"] = N;
-    sj["tau_range"] = { *std::min_element(taus.begin(),taus.end()),
-                        *std::max_element(taus.begin(),taus.end()) };
-    sj["beta_range"] = { *std::min_element(betas.begin(),betas.end()),
-                        *std::max_element(betas.begin(),betas.end()) };
-    sj["metrics"] = mj;
-    auto& arr = sj["components"] = json::array();
-    for (size_t k = 0; k < comps.size(); ++k) {
-        json c;
-        c["id"] = int(k + 1);
-        c["tau"] = comps[k].tau;
-        c["log10_tau"] = std::log10(comps[k].tau);
-        c["beta"] = comps[k].beta;
-        c["amp"] = comps[k].amp;
-        c["prominence"] = comps[k].prominence;
-        c["it"] = comps[k].it;
-        c["jb"] = comps[k].jb;
-        arr.push_back(c);
-    }
-    std::ofstream js(cfg.visualization.outputDir + "/summary.json");
-    js << sj.dump(2) << std::endl;
-}
 

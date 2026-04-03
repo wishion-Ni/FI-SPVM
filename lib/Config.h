@@ -133,6 +133,8 @@ namespace trspv {
     struct VisualizationConfig {
         bool enabled = false;
         std::string outputDir = "results/";
+        double transient_tmax = 1.0;
+        int transient_samples = 300;
     };
 
     /// 完整配置结构
@@ -167,5 +169,7 @@ namespace trspv {
          */
         static Config from_file(const std::string& path);
     };
+
+    void validate_config(const Config& cfg);
 
 } // namespace trspv

@@ -1,33 +1,46 @@
-// Solver2D.h
-#pragma once
+ï»¿#pragma once
 
-#include <vector>
+#include <string>
+
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+
 #include "Config.h"
 
 namespace trspv {
 
-    class Solver2D {
-    public:
-        // omega: M ¸ö½ÇÆµÂÊ£» b: M Î¬¸´¹Û²âÏòÁ¿
-        // taus: N¦Ó ¸öËÉ³ÚÊ±¼ä£» betas: N¦Â ¸öÀ­ÉìÖ¸Êý
-        // acfg: ADMM ÅäÖÃ£¨º¬ lambda1, lambda_tv_tau, lambda_tv_beta, rho µÈ£©
-        Solver2D(const std::vector<double>& omega,
-            const Eigen::VectorXcd& b,
-            const std::vector<double>& taus,
-            const std::vector<double>& betas,
-            const ADMMConfig& acfg);
+struct ParamSelectionResult {
+    double lambda1 = 0.0;
+    double lambda_tv_tau = 0.0;
+    double lambda_tv_beta = 0.0;
+};
 
-        // ÔËÐÐ 2D ·´ÑÝ£¬·µ»Ø³¤¶È N¦Ó¡¤N¦Â µÄÏµÊýÏòÁ¿ x
-        Eigen::VectorXcd solve();
+class Solver2D {
+public:
+    Solver2D(
+        const Eigen::MatrixXcd& A,
+        const Eigen::VectorXcd& b,
+        const ADMMConfig& solve_cfg,
+        const Eigen::SparseMatrix<double>& D);
 
-    private:
-        std::vector<double>    omega_;
-        Eigen::VectorXcd       b_;
-        std::vector<double>    taus_, betas_;
-        ADMMConfig             acfg_;
-    };
+    void set_scan_config(const ADMMConfig& scan_cfg, const ParamSelectionConfig& param_cfg);
+    void solve();
 
-} // namespace trspv
+    const Eigen::VectorXcd& best_solution() const;
+    ParamSelectionResult best_result() const;
+    const std::string& debug_summary() const;
 
+private:
+    Eigen::MatrixXcd A_;
+    Eigen::VectorXcd b_;
+    Eigen::SparseMatrix<double> D_;
+    ADMMConfig solve_cfg_;
+    ADMMConfig scan_cfg_;
+    ParamSelectionConfig param_cfg_;
+    bool has_scan_cfg_ = false;
+    Eigen::VectorXcd best_solution_;
+    ParamSelectionResult best_result_;
+    std::string debug_summary_;
+};
+
+}  // namespace trspv
