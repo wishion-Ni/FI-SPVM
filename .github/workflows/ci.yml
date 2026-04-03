@@ -46,16 +46,10 @@ jobs:
         run: ./vcpkg/bootstrap-vcpkg.sh
 
       - name: Configure
-        env:
-          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
         run: cmake --preset ${{ matrix.configure_preset }}
 
       - name: Build
-        env:
-          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
         run: cmake --build --preset ${{ matrix.build_preset }} --config Release
 
       - name: Test
-        env:
-          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
         run: ctest --preset ${{ matrix.test_preset }} --output-on-failure

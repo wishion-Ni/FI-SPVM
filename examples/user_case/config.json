@@ -1,0 +1,60 @@
+{
+  "data": {
+    "input_file": "examples/user_case/input.csv",
+    "noise_weighted": false,
+    "input_type": "freq"
+  },
+  "kernel": {
+    "tau_min": 1e-5,
+    "tau_max": 1.0,
+    "num_tau": 90,
+    "gamma_min": 0.5,
+    "gamma_max": 1.5,
+    "num_gamma": 25,
+    "gamma_scale": "linear"
+  },
+  "admm": {
+    "lambda1": 1e-3,
+    "lambda_tv_tau": 1e-3,
+    "lambda_tv_beta": 1e-3,
+    "rho": 1.0,
+    "max_iters": 500,
+    "tol_primal": 1e-6,
+    "tol_dual": 1e-6,
+    "group_size_tau": 5,
+    "group_size_beta": 3
+  },
+  "normalization": {
+    "enabled": false
+  },
+  "priors": {
+    "beta_center": 1.0,
+    "beta_sigma": 0.25,
+    "beta_strength": 1.5
+  },
+  "spectrum_completion": {
+    "method": "Akima",
+    "interpolate": true,
+    "num_points": 120,
+    "log_space": true,
+    "weight": 0.2
+  },
+  "param_selection": {
+    "enable": true,
+    "num_lambda1": 5,
+    "num_lambdat": 5,
+    "num_lambdab": 5,
+    "scan_max_iters": 40,
+    "scan_tol": 0.001,
+    "refine_after": true
+  },
+  "logging": {
+    "file": "logs/user_case.log",
+    "level": "INFO",
+    "snapshotInterval": 50
+  },
+  "visualization": {
+    "enabled": true,
+    "outputDir": "results/user_case"
+  }
+}

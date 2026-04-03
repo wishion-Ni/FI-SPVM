@@ -7,15 +7,19 @@
   },
   "configurePresets": [
     {
-      "name": "dev-windows",
-      "displayName": "Dev Windows",
-      "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/out/build/dev-windows",
+      "name": "dev-base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "FI_SPVM_ENABLE_OPENMP": "ON",
         "FI_SPVM_BUILD_TESTS": "ON"
-      },
+      }
+    },
+    {
+      "name": "dev-windows-base",
+      "hidden": true,
+      "inherits": "dev-base",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -23,15 +27,38 @@
       }
     },
     {
+      "name": "dev-windows",
+      "displayName": "Dev Windows (Auto Generator)",
+      "inherits": "dev-windows-base"
+    },
+    {
+      "name": "dev-windows-vs2022",
+      "displayName": "Dev Windows (VS 2022)",
+      "inherits": "dev-windows-base",
+      "generator": "Visual Studio 17 2022"
+    },
+    {
+      "name": "dev-windows-vs2019",
+      "displayName": "Dev Windows (VS 2019)",
+      "inherits": "dev-windows-base",
+      "generator": "Visual Studio 16 2019"
+    },
+    {
+      "name": "dev-windows-ninja",
+      "displayName": "Dev Windows (Ninja)",
+      "inherits": "dev-windows-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
       "name": "dev-linux",
       "displayName": "Dev Linux",
+      "inherits": "dev-base",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/out/build/dev-linux",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "FI_SPVM_ENABLE_OPENMP": "ON",
-        "FI_SPVM_BUILD_TESTS": "ON"
+        "CMAKE_BUILD_TYPE": "Release"
       },
       "condition": {
         "type": "equals",
@@ -47,6 +74,20 @@
       "configuration": "Release"
     },
     {
+      "name": "build-dev-windows-vs2022",
+      "configurePreset": "dev-windows-vs2022",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-dev-windows-vs2019",
+      "configurePreset": "dev-windows-vs2019",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-dev-windows-ninja",
+      "configurePreset": "dev-windows-ninja"
+    },
+    {
       "name": "build-dev-linux",
       "configurePreset": "dev-linux"
     }
@@ -56,6 +97,29 @@
       "name": "test-dev-windows",
       "configurePreset": "dev-windows",
       "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "test-dev-windows-vs2022",
+      "configurePreset": "dev-windows-vs2022",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "test-dev-windows-vs2019",
+      "configurePreset": "dev-windows-vs2019",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "test-dev-windows-ninja",
+      "configurePreset": "dev-windows-ninja",
       "output": {
         "outputOnFailure": true
       }

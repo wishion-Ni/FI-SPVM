@@ -15,23 +15,47 @@ Prerequisites:
 
 - C++17 compiler toolchain
 - CMake 3.24+
-- `vcpkg` checkout with `VCPKG_ROOT` set
-- On Windows: Visual Studio 2022 (or Build Tools 2022 with MSVC)
+- Git (for automatic `vcpkg` bootstrap)
+- On Windows: Visual Studio Build Tools (2019/2022) or Ninja toolchain
+
+Quick path (recommended for new users):
 
 Windows (PowerShell):
 
 ```powershell
-# run inside "Developer PowerShell for VS 2022"
-$env:VCPKG_ROOT="C:\\path\\to\\vcpkg"
-cmake --preset dev-windows
-cmake --build --preset build-dev-windows --config Release
-ctest --preset test-dev-windows --output-on-failure
+.\scripts\build-test.ps1
 ```
 
 Linux (bash):
 
 ```bash
-export VCPKG_ROOT=/path/to/vcpkg
+bash ./scripts/build-test.sh
+```
+
+Manual path (preset commands):
+
+Windows (PowerShell):
+
+```powershell
+# first-time bootstrap
+.\scripts\bootstrap-vcpkg.ps1
+
+# auto generator selection
+cmake --preset dev-windows
+cmake --build --preset build-dev-windows --config Release
+ctest --preset test-dev-windows --output-on-failure
+```
+
+If your machine needs explicit generator selection, use one of:
+
+- `dev-windows-vs2022`
+- `dev-windows-vs2019`
+- `dev-windows-ninja`
+
+Linux (bash):
+
+```bash
+bash ./scripts/bootstrap-vcpkg.sh
 cmake --preset dev-linux
 cmake --build --preset build-dev-linux
 ctest --preset test-dev-linux --output-on-failure
