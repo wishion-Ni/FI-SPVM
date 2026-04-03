@@ -23,6 +23,9 @@ Linux:
 bash ./scripts/build-test.sh
 ```
 
+If `VCPKG_ROOT` is already configured, the scripts and presets will reuse that installation.
+Otherwise they fall back to a repo-local `vcpkg/` clone.
+
 Manual preset path:
 
 Windows:

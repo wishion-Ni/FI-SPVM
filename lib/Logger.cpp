@@ -1,44 +1,45 @@
-#include "Logger.h"
+ï»¿#include "Logger.h"
+
 #include <iostream>
 
 namespace trspv {
 
-    void Logger::init(const std::string& log_file, LogLevel level) {
-        try {
-            // Èç¹ûÒÑÓÐÃûÎª file_logger µÄ logger£¬ÏÈÒÆ³ýËü
-            if (auto existing = spdlog::get("file_logger"); existing) {
-                spdlog::drop("file_logger");
-            }
-            auto file_logger = spdlog::basic_logger_mt("file_logger", log_file);
-            spdlog::set_default_logger(file_logger);
-            switch (level) {
-            case LogLevel::Debug: spdlog::set_level(spdlog::level::debug); break;
-            case LogLevel::Info:  spdlog::set_level(spdlog::level::info);  break;
-            case LogLevel::Warn:  spdlog::set_level(spdlog::level::warn);  break;
-            case LogLevel::Error: spdlog::set_level(spdlog::level::err);   break;
-            }
-            // µ±¼¶±ðÎª info »ò¸ü¸ßÊ±£¬×Ô¶¯ flush
-            spdlog::flush_on(spdlog::level::info);
+void Logger::init(const std::string& log_file, LogLevel level) {
+    try {
+        // Reset the named logger before rebuilding the sink configuration.
+        if (auto existing = spdlog::get("file_logger"); existing) {
+            spdlog::drop("file_logger");
         }
-        catch (const spdlog::spdlog_ex& ex) {
-            std::cerr << "Logger initialization failed: " << ex.what() << std::endl;
+        auto file_logger = spdlog::basic_logger_mt("file_logger", log_file);
+        spdlog::set_default_logger(file_logger);
+        switch (level) {
+        case LogLevel::Debug: spdlog::set_level(spdlog::level::debug); break;
+        case LogLevel::Info:  spdlog::set_level(spdlog::level::info);  break;
+        case LogLevel::Warn:  spdlog::set_level(spdlog::level::warn);  break;
+        case LogLevel::Error: spdlog::set_level(spdlog::level::err);   break;
         }
+        // Flush automatically once the log level reaches info or above.
+        spdlog::flush_on(spdlog::level::info);
     }
+    catch (const spdlog::spdlog_ex& ex) {
+        std::cerr << "Logger initialization failed: " << ex.what() << std::endl;
+    }
+}
 
-    void Logger::debug(const std::string& msg) {
-        spdlog::debug(msg);
-    }
+void Logger::debug(const std::string& msg) {
+    spdlog::debug(msg);
+}
 
-    void Logger::info(const std::string& msg) {
-        spdlog::info(msg);
-    }
+void Logger::info(const std::string& msg) {
+    spdlog::info(msg);
+}
 
-    void Logger::warn(const std::string& msg) {
-        spdlog::warn(msg);
-    }
+void Logger::warn(const std::string& msg) {
+    spdlog::warn(msg);
+}
 
-    void Logger::error(const std::string& msg) {
-        spdlog::error(msg);
-    }
+void Logger::error(const std::string& msg) {
+    spdlog::error(msg);
+}
 
 } // namespace trspv

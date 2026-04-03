@@ -10,7 +10,7 @@
       "name": "dev-base",
       "hidden": true,
       "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "toolchainFile": "${sourceDir}/cmake/vcpkg-toolchain.cmake",
       "cacheVariables": {
         "FI_SPVM_ENABLE_OPENMP": "ON",
         "FI_SPVM_BUILD_TESTS": "ON"

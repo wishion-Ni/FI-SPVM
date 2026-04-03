@@ -32,6 +32,9 @@ Linux (bash):
 bash ./scripts/build-test.sh
 ```
 
+If `VCPKG_ROOT` is already set on your machine, the bootstrap scripts and presets will reuse that installation.
+Otherwise they fall back to a repo-local `vcpkg/` clone.
+
 Manual path (preset commands):
 
 Windows (PowerShell):

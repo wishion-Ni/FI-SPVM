@@ -1,9 +1,19 @@
 [CmdletBinding()]
 param(
-    [string]$VcpkgDir = (Join-Path $PSScriptRoot "..\vcpkg")
+    [string]$VcpkgDir
 )
 
 $ErrorActionPreference = "Stop"
+
+if (-not $VcpkgDir) {
+    if ($env:VCPKG_ROOT -and (Test-Path (Join-Path $env:VCPKG_ROOT "scripts\buildsystems\vcpkg.cmake"))) {
+        $VcpkgDir = $env:VCPKG_ROOT
+    } elseif ($cmd = Get-Command vcpkg -ErrorAction SilentlyContinue) {
+        $VcpkgDir = Split-Path -Parent $cmd.Source
+    } else {
+        $VcpkgDir = Join-Path $PSScriptRoot "..\vcpkg"
+    }
+}
 
 $resolvedVcpkgDir = [System.IO.Path]::GetFullPath($VcpkgDir)
 
@@ -32,4 +42,21 @@ if (-not (Test-Path $vcpkgExe)) {
     }
 }
 
+if (-not $env:VCPKG_DOWNLOADS) {
+    $downloadsCandidates = @(
+        (Join-Path $resolvedVcpkgDir "downloads"),
+        (Join-Path $env:LOCALAPPDATA "vcpkg\downloads")
+    )
+    foreach ($candidate in $downloadsCandidates) {
+        if ($candidate -and (Test-Path $candidate)) {
+            $env:VCPKG_DOWNLOADS = [System.IO.Path]::GetFullPath($candidate)
+            break
+        }
+    }
+}
+
+$env:VCPKG_ROOT = $resolvedVcpkgDir
 Write-Host "vcpkg ready: $resolvedVcpkgDir"
+if ($env:VCPKG_DOWNLOADS) {
+    Write-Host "Using VCPKG_DOWNLOADS: $($env:VCPKG_DOWNLOADS)"
+}
